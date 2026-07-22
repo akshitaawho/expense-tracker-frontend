@@ -10,6 +10,7 @@ interface ExpenseFormProps {
   setDate: (value: string) => void;
 
   onSubmit: () => void;
+  isEditing: boolean;
 }
 
 export default function ExpenseForm({
@@ -22,11 +23,12 @@ export default function ExpenseForm({
   setCategory,
   setDate,
   onSubmit,
+  isEditing,
 }: ExpenseFormProps) {
   return (
     <div className="bg-white rounded-xl p-6 mb-6">
       <h2 className="text-xl font-semibold mb-4">
-        Add Expense
+        {isEditing ? "Edit Expense" : "Add Expense"}
       </h2>
 
       <div className="grid grid-cols-2 gap-4">
@@ -66,7 +68,7 @@ export default function ExpenseForm({
         onClick={onSubmit}
         className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
       >
-        Add Expense
+        {isEditing ? "Update Expense" : "Add Expense"}
       </button>
     </div>
   );

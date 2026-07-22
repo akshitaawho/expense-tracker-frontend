@@ -22,3 +22,16 @@ export async function deleteExpense(id: number) {
     method: "DELETE",
   });
 }
+
+export async function updateExpense(
+  id: number,
+  expense: Omit<Expense, "id">
+) {
+  await fetch(`${API_URL}/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(expense),
+  });
+}

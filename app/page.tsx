@@ -7,6 +7,7 @@ import ExpenseForm from "../components/ExpenseForm";
 import {
   getExpenses,
   createExpense,
+  updateExpense,
   deleteExpense,
 } from "../services/expenseService";
 
@@ -17,6 +18,8 @@ export default function Home() {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
+
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const fetchExpenses = async () => {
     try {
@@ -31,29 +34,52 @@ export default function Home() {
     fetchExpenses();
   }, []);
 
-  const addExpense = async () => {
+  const clearForm = () => {
+    setTitle("");
+    setAmount("");
+    setCategory("");
+    setDate("");
+    setEditingId(null);
+  };
+
+  const handleSubmit = async () => {
     try {
-      await createExpense({
+      const expense = {
         title,
         amount: Number(amount),
         category,
         date,
-      });
+      };
 
-      setTitle("");
-      setAmount("");
-      setCategory("");
-      setDate("");
+      if (editingId !== null) {
+        await updateExpense(editingId, expense);
+      } else {
+        await createExpense(expense);
+      }
 
+      clearForm();
       fetchExpenses();
     } catch (error) {
       console.error(error);
     }
   };
 
+  const handleEditExpense = (expense: Expense) => {
+    setEditingId(expense.id);
+    setTitle(expense.title);
+    setAmount(expense.amount.toString());
+    setCategory(expense.category);
+    setDate(expense.date);
+  };
+
   const handleDeleteExpense = async (id: number) => {
     try {
       await deleteExpense(id);
+
+      if (editingId === id) {
+        clearForm();
+      }
+
       fetchExpenses();
     } catch (error) {
       console.error(error);
@@ -80,7 +106,8 @@ export default function Home() {
           setAmount={setAmount}
           setCategory={setCategory}
           setDate={setDate}
-          onSubmit={addExpense}
+          onSubmit={handleSubmit}
+          isEditing={editingId !== null}
         />
 
         <div className="bg-white rounded-xl p-6">
@@ -96,6 +123,7 @@ export default function Home() {
                 <ExpenseCard
                   key={expense.id}
                   expense={expense}
+                  onEdit={handleEditExpense}
                   onDelete={handleDeleteExpense}
                 />
               ))}
