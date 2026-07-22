@@ -2,6 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Expense } from "../types/expense";
+import ExpenseCard from "../components/ExpenseCard";
+import ExpenseForm from "../components/ExpenseForm";
+import {
+  getExpenses,
+  createExpense,
+  deleteExpense,
+} from "../services/expenseService";
 
 export default function Home() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
@@ -11,11 +18,13 @@ export default function Home() {
   const [category, setCategory] = useState("");
   const [date, setDate] = useState("");
 
-  const fetchExpenses = () => {
-    fetch("http://localhost:8080/expenses")
-      .then((response) => response.json())
-      .then((data) => setExpenses(data))
-      .catch((error) => console.error(error));
+  const fetchExpenses = async () => {
+    try {
+      const data = await getExpenses();
+      setExpenses(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
@@ -23,20 +32,12 @@ export default function Home() {
   }, []);
 
   const addExpense = async () => {
-    const expense = {
-      title,
-      amount: Number(amount),
-      category,
-      date,
-    };
-
     try {
-      await fetch("http://localhost:8080/expenses", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(expense),
+      await createExpense({
+        title,
+        amount: Number(amount),
+        category,
+        date,
       });
 
       setTitle("");
@@ -50,12 +51,9 @@ export default function Home() {
     }
   };
 
-  const deleteExpense = async (id: number) => {
+  const handleDeleteExpense = async (id: number) => {
     try {
-      await fetch(`http://localhost:8080/expenses/${id}`, {
-        method: "DELETE",
-      });
-
+      await deleteExpense(id);
       fetchExpenses();
     } catch (error) {
       console.error(error);
@@ -73,51 +71,17 @@ export default function Home() {
           Manage your daily expenses
         </p>
 
-        <div className="bg-white rounded-xl p-6 mb-6">
-          <h2 className="text-xl font-semibold mb-4">
-            Add Expense
-          </h2>
-
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              placeholder="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-
-            <input
-              type="number"
-              placeholder="Amount"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-
-            <input
-              type="text"
-              placeholder="Category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-
-            <input
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="border rounded-lg p-2"
-            />
-          </div>
-
-          <button
-            onClick={addExpense}
-            className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Add Expense
-          </button>
-        </div>
+        <ExpenseForm
+          title={title}
+          amount={amount}
+          category={category}
+          date={date}
+          setTitle={setTitle}
+          setAmount={setAmount}
+          setCategory={setCategory}
+          setDate={setDate}
+          onSubmit={addExpense}
+        />
 
         <div className="bg-white rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-6">
@@ -129,37 +93,11 @@ export default function Home() {
           ) : (
             <div className="space-y-4">
               {expenses.map((expense) => (
-                <div
+                <ExpenseCard
                   key={expense.id}
-                  className="border rounded-lg p-4 flex justify-between items-center"
-                >
-                  <div>
-                    <h3 className="font-semibold">
-                      {expense.title}
-                    </h3>
-
-                    <p className="text-gray-600">
-                      {expense.category}
-                    </p>
-
-                    <p className="text-sm text-gray-500">
-                      {expense.date}
-                    </p>
-                  </div>
-
-                  <div className="text-right">
-                    <div className="text-lg font-bold mb-2">
-                      ₹{expense.amount}
-                    </div>
-
-                    <button
-                      onClick={() => deleteExpense(expense.id)}
-                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
+                  expense={expense}
+                  onDelete={handleDeleteExpense}
+                />
               ))}
             </div>
           )}
