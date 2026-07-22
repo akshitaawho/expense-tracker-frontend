@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Expense } from "../types/expense";
 import ExpenseCard from "../components/ExpenseCard";
 import ExpenseForm from "../components/ExpenseForm";
+import DashboardCards from "../components/DashboardCards";
 import {
   getExpenses,
   createExpense,
@@ -48,10 +49,14 @@ export default function Home() {
 
   const handleSubmit = async () => {
     try {
+      const formattedCategory =
+        category.charAt(0).toUpperCase() +
+        category.slice(1).toLowerCase();
+
       const expense = {
         title,
         amount: Number(amount),
-        category,
+        category: formattedCategory,
         date,
       };
 
@@ -131,6 +136,16 @@ export default function Home() {
     }
   });
 
+  const totalExpenses = expenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+  const highestExpense =
+    expenses.length > 0
+      ? Math.max(...expenses.map((expense) => expense.amount))
+      : 0;
+
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto p-8">
@@ -141,6 +156,12 @@ export default function Home() {
         <p className="text-gray-600 mb-8">
           Manage your daily expenses
         </p>
+
+        <DashboardCards
+          totalExpenses={totalExpenses}
+          totalEntries={expenses.length}
+          highestExpense={highestExpense}
+        />
 
         <ExpenseForm
           title={title}
