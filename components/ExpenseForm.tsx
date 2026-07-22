@@ -15,6 +15,9 @@ interface ExpenseFormProps {
   selectedCategory: string;
   setSelectedCategory: (value: string) => void;
 
+  sortOption: string;
+  setSortOption: (value: string) => void;
+
   onSubmit: () => void;
   isEditing: boolean;
 }
@@ -32,6 +35,8 @@ export default function ExpenseForm({
   setSearchTerm,
   selectedCategory,
   setSelectedCategory,
+  sortOption,
+  setSortOption,
   onSubmit,
   isEditing,
 }: ExpenseFormProps) {
@@ -104,6 +109,18 @@ export default function ExpenseForm({
           <option value="Health">Health</option>
           <option value="Education">Education</option>
           <option value="Other">Other</option>
+        </select>
+
+        <select
+          value={sortOption}
+          onChange={(e) => setSortOption(e.target.value)}
+          className="w-full border rounded-lg p-2"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="amountHigh">Amount (High → Low)</option>
+          <option value="amountLow">Amount (Low → High)</option>
+          <option value="title">Title (A → Z)</option>
         </select>
       </div>
     </div>

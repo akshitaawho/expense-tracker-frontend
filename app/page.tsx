@@ -23,6 +23,7 @@ export default function Home() {
 
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
+  const [sortOption, setSortOption] = useState("newest");
 
   useEffect(() => {
     fetchExpenses();
@@ -102,6 +103,34 @@ export default function Home() {
     return matchesSearch && matchesCategory;
   });
 
+  const sortedExpenses = [...filteredExpenses].sort((a, b) => {
+    switch (sortOption) {
+      case "newest":
+        return (
+          new Date(b.date).getTime() -
+          new Date(a.date).getTime()
+        );
+
+      case "oldest":
+        return (
+          new Date(a.date).getTime() -
+          new Date(b.date).getTime()
+        );
+
+      case "amountHigh":
+        return b.amount - a.amount;
+
+      case "amountLow":
+        return a.amount - b.amount;
+
+      case "title":
+        return a.title.localeCompare(b.title);
+
+      default:
+        return 0;
+    }
+  });
+
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto p-8">
@@ -126,6 +155,8 @@ export default function Home() {
           setSearchTerm={setSearchTerm}
           selectedCategory={selectedCategory}
           setSelectedCategory={setSelectedCategory}
+          sortOption={sortOption}
+          setSortOption={setSortOption}
           onSubmit={handleSubmit}
           isEditing={editingId !== null}
         />
@@ -135,7 +166,7 @@ export default function Home() {
             Expenses
           </h2>
 
-          {filteredExpenses.length === 0 ? (
+          {sortedExpenses.length === 0 ? (
             <p>
               {expenses.length === 0
                 ? "No expenses yet."
@@ -143,7 +174,7 @@ export default function Home() {
             </p>
           ) : (
             <div className="space-y-4">
-              {filteredExpenses.map((expense) => (
+              {sortedExpenses.map((expense) => (
                 <ExpenseCard
                   key={expense.id}
                   expense={expense}
