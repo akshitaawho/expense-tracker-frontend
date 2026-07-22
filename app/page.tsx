@@ -18,6 +18,10 @@ export default function Home() {
       .catch((error) => console.error(error));
   };
 
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
   const addExpense = async () => {
     const expense = {
       title,
@@ -46,9 +50,17 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
+  const deleteExpense = async (id: number) => {
+    try {
+      await fetch(`http://localhost:8080/expenses/${id}`, {
+        method: "DELETE",
+      });
+
+      fetchExpenses();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gray-100">
@@ -101,7 +113,7 @@ export default function Home() {
 
           <button
             onClick={addExpense}
-            className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg"
+            className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700"
           >
             Add Expense
           </button>
@@ -122,7 +134,9 @@ export default function Home() {
                   className="border rounded-lg p-4 flex justify-between items-center"
                 >
                   <div>
-                    <h3 className="font-semibold">{expense.title}</h3>
+                    <h3 className="font-semibold">
+                      {expense.title}
+                    </h3>
 
                     <p className="text-gray-600">
                       {expense.category}
@@ -133,8 +147,17 @@ export default function Home() {
                     </p>
                   </div>
 
-                  <div className="text-lg font-bold">
-                    ₹{expense.amount}
+                  <div className="text-right">
+                    <div className="text-lg font-bold mb-2">
+                      ₹{expense.amount}
+                    </div>
+
+                    <button
+                      onClick={() => deleteExpense(expense.id)}
+                      className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                    >
+                      Delete
+                    </button>
                   </div>
                 </div>
               ))}
