@@ -9,6 +9,12 @@ interface ExpenseFormProps {
   setCategory: (value: string) => void;
   setDate: (value: string) => void;
 
+  searchTerm: string;
+  setSearchTerm: (value: string) => void;
+
+  selectedCategory: string;
+  setSelectedCategory: (value: string) => void;
+
   onSubmit: () => void;
   isEditing: boolean;
 }
@@ -22,6 +28,10 @@ export default function ExpenseForm({
   setAmount,
   setCategory,
   setDate,
+  searchTerm,
+  setSearchTerm,
+  selectedCategory,
+  setSelectedCategory,
   onSubmit,
   isEditing,
 }: ExpenseFormProps) {
@@ -70,6 +80,32 @@ export default function ExpenseForm({
       >
         {isEditing ? "Update Expense" : "Add Expense"}
       </button>
+
+      <div className="mt-6 space-y-4">
+        <input
+          type="text"
+          placeholder="Search expenses..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full border rounded-lg p-2"
+        />
+
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full border rounded-lg p-2"
+        >
+          <option value="All">All Categories</option>
+          <option value="Food">Food</option>
+          <option value="Travel">Travel</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Bills">Bills</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Health">Health</option>
+          <option value="Education">Education</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
     </div>
   );
 }

@@ -21,6 +21,13 @@ export default function Home() {
 
   const [editingId, setEditingId] = useState<number | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    fetchExpenses();
+  }, []);
+
   const fetchExpenses = async () => {
     try {
       const data = await getExpenses();
@@ -29,10 +36,6 @@ export default function Home() {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    fetchExpenses();
-  }, []);
 
   const clearForm = () => {
     setTitle("");
@@ -86,6 +89,19 @@ export default function Home() {
     }
   };
 
+  const filteredExpenses = expenses.filter((expense) => {
+    const matchesSearch =
+      expense.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      expense.category.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      expense.category.toLowerCase() ===
+        selectedCategory.toLowerCase();
+
+    return matchesSearch && matchesCategory;
+  });
+
   return (
     <main className="min-h-screen bg-gray-100">
       <div className="max-w-4xl mx-auto p-8">
@@ -106,6 +122,10 @@ export default function Home() {
           setAmount={setAmount}
           setCategory={setCategory}
           setDate={setDate}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          selectedCategory={selectedCategory}
+          setSelectedCategory={setSelectedCategory}
           onSubmit={handleSubmit}
           isEditing={editingId !== null}
         />
@@ -115,11 +135,15 @@ export default function Home() {
             Expenses
           </h2>
 
-          {expenses.length === 0 ? (
-            <p>No expenses yet.</p>
+          {filteredExpenses.length === 0 ? (
+            <p>
+              {expenses.length === 0
+                ? "No expenses yet."
+                : "No matching expenses found."}
+            </p>
           ) : (
             <div className="space-y-4">
-              {expenses.map((expense) => (
+              {filteredExpenses.map((expense) => (
                 <ExpenseCard
                   key={expense.id}
                   expense={expense}
