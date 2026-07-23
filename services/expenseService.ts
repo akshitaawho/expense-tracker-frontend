@@ -1,6 +1,6 @@
 import { Expense } from "../types/expense";
 
-const API_URL = "http://localhost:8080/expenses";
+const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/expenses`;
 
 export async function getExpenses(): Promise<Expense[]> {
   const response = await fetch(API_URL);
